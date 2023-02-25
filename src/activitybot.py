@@ -50,15 +50,15 @@ def main():
     groups = ['trainings.and.more','970175383682143']
     webhook_mapping = \
     {
-        '#pinoidea': "https://discord.com/api/webhooks/1073996164002750564/dYIEg4xjxDZ-ujA5KL38_BYkS5Nj_xpOAEUy2cIvKYB7rZZ96BnF4TgcXvaTC3uzzZX0",
+        '#pinoidea': "[Webhook_pinoidea]",
     }
-    webhook_free = "https://discord.com/api/webhooks/1073993194615881779/xORBrcLu4md0it9zG5ObDmKk1QcDyxKuQRqcYxYQcvvjrZQAunixr60Jm-bBqtHZKtQz"
+    webhook_free = "[Webhook_Free]"
     # ---- ---- ---- ---- # Database #
     postlist = []
     with open('db.txt', 'r', encoding='utf-8') as file:
         postlist = [eval(post_str) for post_str in file.readlines()]
 
-    data = datascraper(credentials=('pinoideabot', '-Xqm9_dBWm2dSXU'), accounts=accounts, groups=groups, pages=1)
+    data = datascraper(credentials=('[Username]', '[Password]'), accounts=accounts, groups=groups, pages=1)
 
     # Find the difference between the sets
     diff = [post for post in data if post['post_id'] not in [old_post['post_id'] for old_post in postlist]]
