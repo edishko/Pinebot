@@ -43,15 +43,14 @@ class Facebookbot:
 
         return postlist
 
-    def postdiscord(self, webhook_url, posts):
-        for post in posts:
-            try:
-                payload = {"content": post}
-                response = requests.post(webhook_url, json=payload)
-                if response.status_code != 204:
-                    raise Exception(f"Error posting to Discord: {response.text}")
-            except Exception as e:
-                logging.error(f"Error posting to Discord: {e}")
+    def postdiscord(self, webhook_url, post): 
+        try:
+            payload = {"content": post}
+            response = requests.post(webhook_url, json=payload)
+            if response.status_code != 204:
+                raise Exception(f"Error posting to Discord: {response.text}")
+        except Exception as e:
+            logging.error(f"Error posting to Discord: {e}")
 
     def datapick(self, pages = None, groups = None, amount = 10):
         if not pages and not groups:
@@ -92,10 +91,12 @@ def main():
                 
                     if string in post['text'].lower():
                         bot_fb.postdiscord(webhook_url, message)
-                        bot_fb.postdiscord(webhook_url, post['images_lowquality'])
+                        for image in post['images_lowquality']:
+                            bot_fb.postdiscord(webhook_url, image)
                     else:
-                        bot_fb.postdiscord(webhook_free, [message])
-                        bot_fb.postdiscord(webhook_free, post['images_lowquality'])
+                        bot_fb.postdiscord(webhook_free, message)
+                        for image in post['images_lowquality']:
+                            bot_fb.postdiscord(webhook_url, image)
                 except:
                     logging.error("Error posting post to Discord")
             file.write('%s\n' % post)
