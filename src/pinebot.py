@@ -92,12 +92,12 @@ def main():
                 
                     if string in post['text'].lower():
                         bot_fb.postdiscord(webhook_url, message)
-                        bot_fb.postdiscord(webhook_url, images)
+                        bot_fb.postdiscord(webhook_url, post['images_lowquality'])
                     else:
                         bot_fb.postdiscord(webhook_free, [message])
                         bot_fb.postdiscord(webhook_free, post['images_lowquality'])
                 except:
-                    logging.error(f"Error posting post to Discord")
+                    logging.error("Error posting post to Discord")
             file.write('%s\n' % post)
 
 if __name__ == "__main__":
