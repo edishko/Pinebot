@@ -1,3 +1,4 @@
+# ---- ---- ---- ---- # Libaries #
 from facebook_scraper import get_posts
 import requests
 import time
@@ -5,7 +6,8 @@ import logging
 import json
 import random
 import datetime
-# credentials=('pinoideabot', '-Xqm9_dBWm2dSXU'),
+
+# ---- ---- ---- ---- # Class #
 class Facebookbot:
 
     def __init__(self, credentials, database):
@@ -65,6 +67,7 @@ class Facebookbot:
 
         return diff
 
+# ---- ---- ---- ---- # Main #
 def main():
     # # ---- ---- ---- ---- # Configuration #
     pages = ['page1', 'page2', 'page3']
