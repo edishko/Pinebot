@@ -11,6 +11,8 @@ class Facebookbot:
     def __init__(self, credentials, database):
         self.credentials = credentials
         self.database = database
+        with open(self.database, 'w') as file:
+            print('passed a check!')
 
     def datascrape(self, pages = None, groups = None, amount = 10):
         if not pages and not groups:
