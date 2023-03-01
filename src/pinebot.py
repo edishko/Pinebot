@@ -13,8 +13,13 @@ class Facebookbot:
     def __init__(self, credentials, database):
         self.credentials = credentials
         self.database = database
-        with open(self.database, 'w') as file:
-            print('passed a check!')
+
+        try:
+            with open(self.database) as f:
+                pass
+        except FileNotFoundError:
+            with open(self.database, "w") as f:
+                pass
 
     def datascrape(self, pages = None, groups = None, amount = 10):
         if not pages and not groups:
@@ -68,7 +73,8 @@ class Facebookbot:
 
 # ---- ---- ---- ---- # Main #
 def main():
-    # # ---- ---- ---- ---- # Configuration #
+    # ---- ---- ---- ---- # Configuration #
+    database = 'db.txt'
     pages = ['page1', 'page2', 'page3']
     groups = ['group1', 'group2']
     webhook_mapping = \
@@ -77,12 +83,12 @@ def main():
     }
     webhook_free = "[webhook_free]"
 
-    bot_fb = Facebookbot(credentials = ('username', 'password'), database = 'db.txt')
+    bot_fb = Facebookbot(credentials = ('username', 'password'), database = database)
 
-    # # ---- ---- ---- ---- # Database #
+    # ---- ---- ---- ---- # Database #
     posts = bot_fb.datapick(pages = pages, groups = groups, amount = 1)
     
-    with open('db.txt', 'a+', encoding='utf-8') as file:
+    with open(database, 'a+', encoding='utf-8') as file:
         for post in posts:
             time.sleep(2)
             for string, webhook_url in webhook_mapping.items():
@@ -96,7 +102,7 @@ def main():
                     else:
                         bot_fb.postdiscord(webhook_free, message)
                         for image in post['images_lowquality']:
-                            bot_fb.postdiscord(webhook_url, image)
+                            bot_fb.postdiscord(webhook_free, image)
                 except:
                     logging.error("Error posting post to Discord")
             file.write('%s\n' % post)
