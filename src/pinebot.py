@@ -10,7 +10,7 @@ import datetime
 # ---- ---- ---- ---- # Class #
 class Facebookbot:
 
-    def __init__(self, credentials, database):
+    def __init__(self, database, credentials = None):
         self.credentials = credentials
         self.database = database
 
@@ -48,7 +48,7 @@ class Facebookbot:
 
         return postlist
 
-    def postdiscord(self, webhook_url, post): 
+    def postdiscord(self, webhook_url, post):
         try:
             payload = {"content": post}
             response = requests.post(webhook_url, json=payload)
@@ -57,44 +57,61 @@ class Facebookbot:
         except Exception as e:
             logging.error(f"Error posting to Discord: {e}")
 
+    def remove_duplicates(self, dicts, keys):
+        seen = set()
+        new_list = []
+        for d in dicts:
+            values = tuple(d[k] for k in keys)
+            if values not in seen:
+                seen.add(values)
+                new_list.append(d)
+        return new_list
+
     def datapick(self, pages = None, groups = None, amount = 10):
         if not pages and not groups:
             raise ValueError("At least one account or group must be provided.")
 
-        with open('db.txt', 'r', encoding='utf-8') as file:
+        with open(self.database, 'r', encoding='utf-8') as file:
             postlist = [eval(post_str) for post_str in file.readlines()]
 
         data = self.datascrape(pages, groups, amount)
 
         # Find the difference between the sets
-        diff = [post for post in data if post['post_id'] != [old_post['post_id'] for old_post in postlist]]
+        diff = [post for post in data if post['post_id'] not in [old_post['post_id'] for old_post in postlist]]
+     
+        # define a helper function to extract the value of a given key from a dictionary
+        def get_dict_value(d, key):
+            return d[key]
+
+        # remove duplicates based on the 'name' key
+        diff = list({get_dict_value(d, 'text'): d for d in diff}.values())
 
         return diff
-
 # ---- ---- ---- ---- # Main #
 def main():
     # ---- ---- ---- ---- # Configuration #
     database = 'db.txt'
     pages = ['page1', 'page2', 'page3']
-    groups = ['group1', 'group2']
+    groups = ['group1', 'group2', 'group3']
     webhook_mapping = \
     {
-        '#pinoidea': "[webhook_mapping_pinoidea]",
+        '#pinoidea': "[pinoideahook]",
     }
-    webhook_free = "[webhook_free]"
+    webhook_free = "[freehook]"
 
-    bot_fb = Facebookbot(credentials = ('username', 'password'), database = database)
+    bot_fb = Facebookbot(database = database, credentials= ('username', 'password'))
 
     # ---- ---- ---- ---- # Database #
     posts = bot_fb.datapick(pages = pages, groups = groups, amount = 1)
-    
+
     with open(database, 'a+', encoding='utf-8') as file:
+        
         for post in posts:
             time.sleep(2)
             for string, webhook_url in webhook_mapping.items():
                 try:
                     message = f"⏩          {post['post_url']}          ⏪ \n ```{post['text']}```"
-                
+
                     if string in post['text'].lower():
                         bot_fb.postdiscord(webhook_url, message)
                         for image in post['images_lowquality']:
